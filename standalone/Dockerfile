@@ -24,6 +24,9 @@ EXPOSE $SELENIUM_PORT
 # vnc port
 EXPOSE $VNC_PORT
 
+# selenium server
+ADD http://selenium-release.storage.googleapis.com/$SELENIUM_MAJOR_VERSION.$SELENIUM_MINOR_VERSION/selenium-server-standalone-$SELENIUM_VERSION.jar $SELENIUM_PATH
+
 # chrome
 RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
     rpm -i google-chrome-stable_current_x86_64.rpm && \
@@ -46,9 +49,6 @@ RUN curl -LO https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FI
 RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz && \
     tar -C /usr/bin/ -xvf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz && \
     rm -f geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-
-# selenium server
-ADD http://selenium-release.storage.googleapis.com/$SELENIUM_MAJOR_VERSION.$SELENIUM_MINOR_VERSION/selenium-server-standalone-$SELENIUM_VERSION.jar $SELENIUM_PATH
 
 # Add the xstartup file into the image and add config.
 COPY ./xstartup ./config .vnc/

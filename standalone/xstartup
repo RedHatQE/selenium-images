@@ -1,10 +1,6 @@
 #!/bin/sh
 
-unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
-
-[[ -x /etc/vnc/xstartup ]] && exec /etc/vnc/xstartup
-[[ -r $SELENIUM_HOME/.Xresources ]] && xrdb $SELENIUM_HOME/.Xresources
 
 xsetroot -solid grey
 fluxbox &
