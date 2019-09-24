@@ -1,0 +1,23 @@
+name: Building Red Hat QE selenium images
+
+on: [push]
+
+jobs:
+
+  build:
+ 
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        firefox_version: ["60.9.0esr", "68.1.0esr", "69.0.1"]
+        gecko_version: ["v0.24.0", "v0.25.0"]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Login
+      run: echo ${{ secrets.QUAY_IO_TOKEN }} | docker login -u ${{ secrets.QUAY_IO_USERNAME }} --password-stdin quay.io
+    - name: Build standalone image
+      run: docker build --build-arg FIREFOX_VERSION=${{ matrix.firefox_version }} --build-arg GECKODRIVER_VERSION=${{ matrix.gecko_version }} --file standalone/Dockerfile --tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} standalone
+    - name: Push standalone image
+      run: docker push quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}
