@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:30
+FROM registry.fedoraproject.org/fedora:31
 LABEL maintainer="dmisharo@redhat.com"
 
 ENV SELENIUM_HOME=/home/selenium

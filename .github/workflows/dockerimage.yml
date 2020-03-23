@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        firefox_version: ["60.9.0esr", "73.0", "68.5.0esr"]
+        firefox_version: ["60.9.0esr", "74.0", "68.6.0esr"]
         gecko_version: ["v0.25.0", "v0.26.0"]
     steps:
     - uses: actions/checkout@v1
