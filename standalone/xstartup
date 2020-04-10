@@ -1,8 +1,0 @@
-#!/bin/sh
-
-unset DBUS_SESSION_BUS_ADDRESS
-
-xsetroot -solid grey
-fluxbox &
-sleep 5
-java -jar $SELENIUM_PATH -port $SELENIUM_PORT >> /proc/1/fd/1 2>&1

@@ -9,9 +9,10 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_PATCH_VERSION=59 \
     SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
-    FIREFOX_VERSION=${FIREFOX_VERSION:-"68.6.0esr"} \
+    FIREFOX_VERSION=${FIREFOX_VERSION:-"68.7.0esr"} \
     GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.26.0"} \
     DISPLAY=:99 \
+    DBUS_SESSION_BUS_ADDRESS=/dev/null \
     HOME=$SELENIUM_HOME
 
 ENV SELENIUM_VERSION=$SELENIUM_MAJOR_VERSION.$SELENIUM_MINOR_VERSION.$SELENIUM_PATCH_VERSION \
@@ -50,13 +51,13 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/$GECKODRIV
     tar -C /usr/bin/ -xvf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz && \
     rm -f geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
 
-# Add the xstartup file into the image and add config.
-COPY ./xstartup ./config .vnc/
+COPY start.sh $SELENIUM_HOME
 
-RUN chmod a+x $SELENIUM_HOME/.vnc/xstartup && \
+RUN chmod +x $SELENIUM_HOME/start.sh && \
     chgrp -R 0 $SELENIUM_HOME && \
     chmod -R g=u $SELENIUM_HOME
 
 USER 1001
 
-ENTRYPOINT /usr/bin/dumb-init vncserver $DISPLAY -fg -Log *:stderr:100
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["./start.sh"]
