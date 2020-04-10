@@ -15,7 +15,6 @@ RUN dnf -y update && \
         fluxbox \
         java-1.8.0-openjdk \
         libappindicator-gtk3 \
-        libcurl \
         liberation-fonts \
         libXScrnSaver \
         net-tools \
@@ -24,8 +23,12 @@ RUN dnf -y update && \
         unzip \
         wget \
         xdg-utils \
-        xdotool && \
+        xdotool \
+        mesa-libgbm \
+        vulkan-loader && \
     dnf clean all && \
     touch $SELENIUM_HOME/.Xauthority && \
     mkdir -p $SELENIUM_HOME/.cache/dconf && \
-    mkdir -p $SELENIUM_HOME/.mozilla/plugins
+    mkdir -p $SELENIUM_HOME/.mozilla/plugins && \
+    mkdir -p $SELENIUM_HOME/.vnc/ && \
+    touch $SELENIUM_HOME/.vnc/config
