@@ -51,13 +51,13 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/$GECKODRIV
     tar -C /usr/bin/ -xvf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz && \
     rm -f geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
 
-COPY start.sh $SELENIUM_HOME
+COPY start.sh /
 
-RUN chmod +x $SELENIUM_HOME/start.sh && \
+RUN chmod +x /start.sh && \
     chgrp -R 0 $SELENIUM_HOME && \
     chmod -R g=u $SELENIUM_HOME
 
 USER 1001
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["./start.sh"]
+CMD ["/start.sh"]
