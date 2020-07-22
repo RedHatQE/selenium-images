@@ -1,8 +1,13 @@
 FROM quay.io/redhatqe/selenium-base
 LABEL maintainer="dmisharo@redhat.com"
 
+# Firefox releases
+# https://download-installer.cdn.mozilla.net/pub/firefox/releases/
+# Chrome versions
+# https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
 ARG FIREFOX_VERSION
 ARG GECKODRIVER_VERSION
+ARG CHROME_VERSION
 
 ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_MINOR_VERSION=141 \
@@ -10,6 +15,7 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
     FIREFOX_VERSION=${FIREFOX_VERSION:-"78.0.2esr"} \
+    CHROME_VERSION=${CHROME_VERSION:-"84.0.4147.89"} \
     GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.26.0"} \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
@@ -29,9 +35,11 @@ EXPOSE $VNC_PORT
 ADD http://selenium-release.storage.googleapis.com/$SELENIUM_MAJOR_VERSION.$SELENIUM_MINOR_VERSION/selenium-server-standalone-$SELENIUM_VERSION.jar $SELENIUM_PATH
 
 # chrome
-RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
-    rpm -i google-chrome-stable_current_x86_64.rpm && \
-    rm -f google-chrome-stable_current_x86_64.rpm
+RUN curl -L https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-$CHROME_VERSION-1.x86_64.rpm \
+         -o google-chrome-stable-x86_64.rpm && \
+    # curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+    rpm -i google-chrome-stable-x86_64.rpm && \
+    rm -f google-chrome-stable-x86_64.rpm
 
 # chrome and chrome driver versions should match in order to avoid incompatibility
 RUN CHROME_VERSION=$(rpm -q --qf "%{VERSION}\n" google-chrome-stable | sed -Ee 's/^(.*)\..*/\1/') && \
