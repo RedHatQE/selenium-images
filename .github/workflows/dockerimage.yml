@@ -1,6 +1,9 @@
-name: Building Red Hat QE selenium images
+name: CI/CD
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
 
@@ -9,22 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        firefox_version: ["60.9.0esr", "76.0.1", "68.8.0esr"]
+        firefox_version: ["68.9.0esr", "78.0.2", "78.0.2esr"]
         gecko_version: ["v0.25.0", "v0.26.0"]
     steps:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
     - name: Build standalone image
-      run: docker build --build-arg FIREFOX_VERSION=${{ matrix.firefox_version }} --build-arg GECKODRIVER_VERSION=${{ matrix.gecko_version }} --file standalone/Dockerfile --tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} standalone
-    - name: Tag latest
-      # job-index start from 0 an we want to tag image by "latest" only in last job
-      if: strategy.job-index == 5
-      run: docker tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} quay.io/redhatqe/selenium-standalone:latest
+      run: buildah bud --build-arg FIREFOX_VERSION=${{ matrix.firefox_version }} --build-arg GECKODRIVER_VERSION=${{ matrix.gecko_version }} --file standalone/Dockerfile --tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} standalone
+    # - name: Tag latest
+    #   # job-index start from 0 an we want to tag image by "latest" only in last job
+    #   if: strategy.job-index == 5
+    #   run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} quay.io/redhatqe/selenium-standalone:latest
     - name: quay.io login
-      run: echo ${{ secrets.QUAY_IO_TOKEN }} | docker login -u ${{ secrets.QUAY_IO_USERNAME }} --password-stdin quay.io
+      run: echo ${{ secrets.QUAY_IO_TOKEN }} | buildah login -u ${{ secrets.QUAY_IO_USERNAME }} --password-stdin quay.io
     - name: Push standalone image
-      run: docker push quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}
-    - name: Push latest standalone image
-      if: strategy.job-index == 5
-      run: docker push quay.io/redhatqe/selenium-standalone:latest
+      run: buildah push quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}
+    # - name: Push latest standalone image
+    #   if: strategy.job-index == 5
+    #   run: buildah push quay.io/redhatqe/selenium-standalone:latest
