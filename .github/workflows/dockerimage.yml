@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        firefox_version: ["68.9.0esr", "78.0.2", "78.0.2esr"]
+        firefox_version: ["68.11.0esr", "79.0", "78.1.0esr"]
         chrome_version: ["84.0.4147.89"]
-        gecko_version: ["v0.26.0"]
+        gecko_version: ["v0.26.0", "v0.27.0"]
     steps:
     - uses: actions/checkout@v1
       with:
@@ -30,11 +30,11 @@ jobs:
     - name: Tag latest
       # job-index start from 0 an we want to tag image by "latest" only in last job
       if: strategy.job-index == 5
-      run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }} quay.io/redhatqe/selenium-standalone:latest
+      run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
     - name: quay.io login
       run: echo ${{ secrets.QUAY_IO_TOKEN }} | buildah login -u ${{ secrets.QUAY_IO_USERNAME }} --password-stdin quay.io
     - name: Push standalone image
       run: buildah push quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
-    # - name: Push latest standalone image
-    #   if: strategy.job-index == 5
-    #   run: buildah push quay.io/redhatqe/selenium-standalone:latest
+    - name: Push latest standalone image
+      if: strategy.job-index == 5
+      run: buildah push quay.io/redhatqe/selenium-standalone:latest
