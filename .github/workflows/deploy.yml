@@ -29,6 +29,10 @@ jobs:
             CHROME_VERSION=${{ matrix.chrome_version }}
             FIREFOX_VERSION=${{ matrix.firefox_version }}
             GECKODRIVER_VERSION=${{ matrix.gecko_version }}
+      - name: Tag latest
+        # job-index start from 0 an we want to tag image by "latest" only in last job
+        if: strategy.job-index == 5
+        run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
       - name: Push standalone image
         uses: redhat-actions/push-to-registry@v1
         with:
