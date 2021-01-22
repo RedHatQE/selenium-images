@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  pull_request:
+    types: ["opened", "synchronize", "reopened"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Build base image
+        uses: redhat-actions/buildah-build@v1
+        with:
+          image: quay.io/redhatqe/selenium-base
+          dockerfiles: base/Dockerfile
+          context: base
+          oci: true
+      - name: Build standalone image
+        uses: redhat-actions/buildah-build@v1
+        with:
+          image: quay.io/redhatqe/selenium-standalone
+          dockerfiles: standalone/Dockerfile
+          context: standalone
+          oci: true

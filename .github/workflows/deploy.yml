@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        firefox_version: ["68.12.0esr", "84.0.2", "78.6.1esr"]
+        chrome_version: ["88.0.4324.96"]
+        gecko_version: ["v0.28.0", "v0.29.0"]
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Build standalone image
+        uses: redhat-actions/buildah-build@v1
+        with:
+          image: quay.io/redhatqe/selenium-standalone
+          tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          dockerfiles: standalone/Dockerfile
+          context: standalone
+          oci: true
+          build-args: |
+            CHROME_VERSION=${{ matrix.chrome_version }}
+            FIREFOX_VERSION=${{ matrix.firefox_version }}
+            GECKODRIVER_VERSION=${{ matrix.gecko_version }}
+      - name: Push standalone image
+        uses: redhat-actions/push-to-registry@v1
+        with:
+          image: quay.io/redhatqe/selenium-standalone
+          tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          registry: quay.io/redhatqe
+          username: ${{ secrets.QUAY_IO_USERNAME }}
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+      - name: Push "latest" standalone image
+        if: strategy.job-index == 5
+        uses: redhat-actions/push-to-registry@v1
+        with:
+          image: quay.io/redhatqe/selenium-standalone
+          tag: latest
+          registry: quay.io/redhatqe
+          username: ${{ secrets.QUAY_IO_USERNAME }}
+          password: ${{ secrets.QUAY_IO_TOKEN }}

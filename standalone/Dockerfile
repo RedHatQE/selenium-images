@@ -1,4 +1,4 @@
-FROM quay.io/redhatqe/selenium-base
+FROM quay.io/redhatqe/selenium-base:latest
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
@@ -14,9 +14,9 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_PATCH_VERSION=59 \
     SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
-    FIREFOX_VERSION=${FIREFOX_VERSION:-"78.0.2esr"} \
-    CHROME_VERSION=${CHROME_VERSION:-"84.0.4147.89"} \
-    GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.26.0"} \
+    FIREFOX_VERSION=${FIREFOX_VERSION:-"78.6.1esr"} \
+    CHROME_VERSION=${CHROME_VERSION:-"88.0.4324.96"} \
+    GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.29.0"} \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
     HOME=$SELENIUM_HOME
