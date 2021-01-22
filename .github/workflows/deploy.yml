@@ -32,7 +32,7 @@ jobs:
       - name: Push standalone image
         uses: redhat-actions/push-to-registry@v1
         with:
-          image: quay.io/redhatqe/selenium-standalone
+          image: selenium-standalone
           tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
@@ -41,7 +41,7 @@ jobs:
         if: strategy.job-index == 5
         uses: redhat-actions/push-to-registry@v1
         with:
-          image: quay.io/redhatqe/selenium-standalone
+          image: selenium-standalone
           tag: latest
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
