@@ -25,7 +25,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2.5
         with:
           image: quay.io/redhatqe/selenium-standalone
-          tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          tags: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
           dockerfiles: standalone/Dockerfile
           context: standalone
           oci: true
@@ -41,7 +41,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2.2
         with:
           image: selenium-standalone
-          tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          tags: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2.2
         with:
           image: selenium-standalone
-          tag: latest
+          tags: latest
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_TOKEN }}
