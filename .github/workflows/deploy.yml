@@ -10,15 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        firefox_version: ["68.12.0esr", "84.0.2", "78.6.1esr"]
-        chrome_version: ["88.0.4324.96"]
-        gecko_version: ["v0.28.0", "v0.29.0"]
+        # Firefox releases
+        # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
+        # Chrome versions
+        # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
+        firefox_version: ["68.12.0esr", "78.9.0esr", "87.0"]
+        chrome_version: ["89.0.4389.128-1"]
+        gecko_version: ["v0.28.0", "0.29.1"]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Build standalone image
-        uses: redhat-actions/buildah-build@v1
+        uses: redhat-actions/buildah-build@v2.5
         with:
           image: quay.io/redhatqe/selenium-standalone
           tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
@@ -34,7 +38,7 @@ jobs:
         if: strategy.job-index == 5
         run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
       - name: Push standalone image
-        uses: redhat-actions/push-to-registry@v1
+        uses: redhat-actions/push-to-registry@v2.2
         with:
           image: selenium-standalone
           tag: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
@@ -43,7 +47,7 @@ jobs:
           password: ${{ secrets.QUAY_IO_TOKEN }}
       - name: Push "latest" standalone image
         if: strategy.job-index == 5
-        uses: redhat-actions/push-to-registry@v1
+        uses: redhat-actions/push-to-registry@v2.2
         with:
           image: selenium-standalone
           tag: latest
