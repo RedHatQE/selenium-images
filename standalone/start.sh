@@ -11,7 +11,7 @@ cleanup() {
 
 vncserver $DISPLAY -noxstartup \
                    -securitytypes none \
-                   -geometry 1600x900 \
+                   -geometry "${VNC_GEOMETRY:-1600x900}" \
                    -depth 16 \
                    -alwaysshared &
 
