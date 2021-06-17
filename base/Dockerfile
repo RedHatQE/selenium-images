@@ -1,3 +1,4 @@
+ARG ARCH=
 FROM registry.fedoraproject.org/fedora:31
 LABEL maintainer="dmisharo@redhat.com"
 
