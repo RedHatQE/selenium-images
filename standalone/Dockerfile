@@ -14,9 +14,9 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_PATCH_VERSION=59 \
     SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
-    FIREFOX_VERSION=${FIREFOX_VERSION:-"78.6.1esr"} \
-    CHROME_VERSION=${CHROME_VERSION:-"88.0.4324.96"} \
-    GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.29.0"} \
+    FIREFOX_VERSION=${FIREFOX_VERSION:-"78.11.0esr"} \
+    CHROME_VERSION=${CHROME_VERSION:-"91.0.4472.114"} \
+    GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.29.1"} \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
     HOME=$SELENIUM_HOME
@@ -60,6 +60,7 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/$GECKODRIV
     rm -f geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
 
 COPY start.sh /
+COPY config $HOME/.vnc/config
 
 RUN chmod +x /start.sh && \
     chgrp -R 0 $SELENIUM_HOME && \

@@ -1,12 +1,11 @@
-FROM registry.fedoraproject.org/fedora:31
+FROM registry.fedoraproject.org/fedora:34
 LABEL maintainer="dmisharo@redhat.com"
 
 ENV SELENIUM_HOME=/home/selenium
 
 WORKDIR $SELENIUM_HOME
 
-RUN dnf -y update && \
-    dnf install -y --setopt=tsflags=nodocs \
+RUN dnf install -y --nodocs \
         bzip2 \
         dbus-glib \
         dejavu-sans-fonts \
@@ -24,11 +23,10 @@ RUN dnf -y update && \
         wget \
         xdg-utils \
         xdotool \
+        xmodmap \
+        xrdb \
         mesa-libgbm \
         vulkan-loader && \
     dnf clean all && \
-    touch $SELENIUM_HOME/.Xauthority && \
-    mkdir -p $SELENIUM_HOME/.cache/dconf && \
-    mkdir -p $SELENIUM_HOME/.mozilla/plugins && \
-    mkdir -p $SELENIUM_HOME/.vnc/ && \
-    touch $SELENIUM_HOME/.vnc/config
+    mkdir -p .cache/dconf .mozilla/plugins .vnc/ && \
+    touch .Xauthority .vnc/config .Xmodmap
