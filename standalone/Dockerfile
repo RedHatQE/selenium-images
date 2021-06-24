@@ -19,7 +19,8 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.29.1"} \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
-    HOME=$SELENIUM_HOME
+    HOME=$SELENIUM_HOME \
+    VNC_GEOMETRY=${VNC_GEOMETRY:-"1600x900"}
 
 ENV SELENIUM_VERSION=$SELENIUM_MAJOR_VERSION.$SELENIUM_MINOR_VERSION.$SELENIUM_PATCH_VERSION \
     SELENIUM_PATH=$SELENIUM_HOME/selenium-server/selenium-server-standalone.jar \
@@ -60,7 +61,6 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/$GECKODRIV
     rm -f geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
 
 COPY start.sh /
-COPY config $HOME/.vnc/config
 
 RUN chmod +x /start.sh && \
     chgrp -R 0 $SELENIUM_HOME && \
