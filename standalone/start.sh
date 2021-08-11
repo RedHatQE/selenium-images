@@ -1,5 +1,13 @@
 #!/bin/sh
 
+trap cleanup 1 2 3 6
+cleanup() {
+    # we would like to shutdown everything gracefully in the right order
+    pkill --signal SIGTERM java && \
+    pkill --signal SIGTERM fluxbox && \
+    pkill --signal SIGTERM Xvnc
+}
+
 /usr/bin/Xvnc $DISPLAY \
               -alwaysshared \
               -depth 16 \
