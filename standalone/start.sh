@@ -15,7 +15,4 @@ sleep 3
 
 startfluxbox > /dev/null 2>&1 &
 
-java -jar ${SELENIUM_PATH} -port ${SELENIUM_PORT} 2>&1 &
-
-# a hack preventing fluxbox core dump
-cat
+java -jar ${SELENIUM_PATH} -port ${SELENIUM_PORT} 2>&1
