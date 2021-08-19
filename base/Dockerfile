@@ -3,30 +3,93 @@ LABEL maintainer="dmisharo@redhat.com"
 
 ENV SELENIUM_HOME=/home/selenium
 
-WORKDIR $SELENIUM_HOME
+WORKDIR ${SELENIUM_HOME}
 
-RUN dnf install -y --nodocs \
-        bzip2 \
-        dbus-glib \
-        dejavu-sans-fonts \
-        dejavu-serif-fonts \
-        dumb-init \
-        fluxbox \
-        java-1.8.0-openjdk \
-        libappindicator-gtk3 \
-        liberation-fonts \
-        libXScrnSaver \
-        net-tools \
-        redhat-lsb \
-        tigervnc-server \
-        unzip \
-        wget \
-        xdg-utils \
-        xdotool \
-        xmodmap \
-        xrdb \
-        mesa-libgbm \
-        vulkan-loader && \
+RUN PACKAGES="\
+        alsa-lib-1.2.5.1-1.fc34.x86_64 \
+        at-spi2-atk-2.38.0-2.fc34.x86_64 \
+        at-spi2-core-2.40.3-1.fc34.x86_64 \
+        atk-2.36.0-3.fc34.x86_64 \
+        avahi-libs-0.8-14.fc34.x86_64 \
+        bzip2-1.0.8-6.fc34.x86_64 \
+        cairo-1.17.4-3.fc34.x86_64 \
+        cairo-gobject-1.17.4-3.fc34.x86_64 \
+        cups-libs-2.3.3op2-7.fc34.x86_64 \
+        dbus-glib-0.110-11.fc34.x86_64 \
+        dbus-libs-1.12.20-3.fc34.x86_64 \
+        fluxbox-1.3.7-17.fc34.x86_64 \
+        fontconfig-2.13.94-2.fc34.x86_64 \
+        freetype-2.10.4-3.fc34.x86_64 \
+        fribidi-1.0.10-4.fc34.x86_64 \
+        gdk-pixbuf2-2.42.6-1.fc34.x86_64 \
+        graphite2-1.3.14-7.fc34.x86_64 \
+        gtk3-3.24.30-1.fc34.x86_64 \
+        harfbuzz-2.7.4-3.fc34.x86_64 \
+        imlib2-1.6.1-3.fc34.x86_64 \
+        java-1.8.0-openjdk-headless-1.8.0.302.b08-0.fc34.x86_64 \
+        libcloudproviders-0.3.1-3.fc34.x86_64 \
+        libdatrie-0.2.13-1.fc34.x86_64 \
+        libdrm-2.4.107-1.fc34.x86_64 \
+        libepoxy-1.5.9-1.fc34.x86_64 \
+        liberation-fonts-2.1.4-1.fc34.noarch \
+        liberation-fonts-common-2.1.4-1.fc34.noarch \
+        liberation-mono-fonts-2.1.4-1.fc34.noarch \
+        liberation-sans-fonts-2.1.4-1.fc34.noarch \
+        liberation-serif-fonts-2.1.4-1.fc34.noarch \
+        libfontenc-1.1.3-15.fc34.x86_64 \
+        libglvnd-1.3.3-1.fc34.x86_64 \
+        libglvnd-glx-1.3.3-1.fc34.x86_64 \
+        libICE-1.0.10-6.fc34.x86_64 \
+        libjpeg-turbo-2.0.90-2.fc34.x86_64 \
+        libpng-1.6.37-10.fc34.x86_64 \
+        libSM-1.2.3-8.fc34.x86_64 \
+        libthai-0.1.28-6.fc34.x86_64 \
+        libwayland-client-1.19.0-1.fc34.x86_64 \
+        libwayland-cursor-1.19.0-1.fc34.x86_64 \
+        libwayland-egl-1.19.0-1.fc34.x86_64 \
+        libwayland-server-1.19.0-1.fc34.x86_64 \
+        libwebp-1.2.1-1.fc34.x86_64 \
+        libX11-1.7.2-3.fc34.x86_64 \
+        libX11-common-1.7.2-3.fc34.noarch \
+        libX11-xcb-1.7.2-3.fc34.x86_64 \
+        libXau-1.0.9-6.fc34.x86_64 \
+        libxcb-1.13.1-7.fc34.x86_64 \
+        libXcomposite-0.4.5-5.fc34.x86_64 \
+        libXcursor-1.2.0-5.fc34.x86_64 \
+        libXdamage-1.1.5-5.fc34.x86_64 \
+        libXdmcp-1.1.3-6.fc34.x86_64 \
+        libXext-1.3.4-6.fc34.x86_64 \
+        libXfixes-6.0.0-1.fc34.x86_64 \
+        libXfont2-2.0.3-10.fc34.x86_64 \
+        libXft-2.3.3-6.fc34.x86_64 \
+        libXi-1.7.10-6.fc34.x86_64 \
+        libXinerama-1.1.4-8.fc34.x86_64 \
+        libxkbcommon-1.3.0-1.fc34.x86_64 \
+        libxkbfile-1.1.0-6.fc34.x86_64 \
+        libXpm-3.5.13-5.fc34.x86_64 \
+        libXrandr-1.5.2-6.fc34.x86_64 \
+        libXrender-0.9.10-14.fc34.x86_64 \
+        libxshmfence-1.3-8.fc34.x86_64 \
+        libXt-1.2.0-4.fc34.x86_64 \
+        mesa-libgbm-21.1.7-1.fc34.x86_64 \
+        nspr-4.32.0-1.fc34.x86_64 \
+        nss-3.69.0-1.fc34.x86_64 \
+        nss-softokn-3.69.0-1.fc34.x86_64 \
+        nss-softokn-freebl-3.69.0-1.fc34.x86_64 \
+        nss-util-3.69.0-1.fc34.x86_64 \
+        pango-1.48.8-1.fc34.x86_64 \
+        pixman-0.40.0-3.fc34.x86_64 \
+        tigervnc-server-minimal-1.11.0-12.fc34.x86_64 \
+        tzdata-java-2021a-1.fc34.noarch \
+        unzip-6.0-50.fc34.x86_64 \
+        vulkan-loader-1.2.162.0-2.fc34.x86_64 \
+        wget-1.21.1-3.fc34.x86_64 \
+        xdg-utils-1.1.3-9.fc34.noarch \
+        xkbcomp-1.4.4-2.fc34.x86_64 \
+        xkeyboard-config-2.33-1.fc34.noarch" && \
+    dnf --downloadonly --downloaddir=/tmp/cache install -y --setopt=install_weak_deps=False --nodocs ${PACKAGES} && \
+    for PACKAGE in ${PACKAGES}; do rpm -Uvh --nodeps /tmp/cache/${PACKAGE}.rpm; done && \
+    rm -rf /tmp/cache && \
     dnf clean all && \
     mkdir -p .cache/dconf .mozilla/plugins .vnc/ && \
-    touch .Xauthority .vnc/config .Xmodmap
+    touch .Xauthority .vnc/config
