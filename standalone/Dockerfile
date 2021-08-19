@@ -9,10 +9,12 @@ LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
+ARG FIREFOX_VERSION
+# Gecko driver releases
+# https://github.com/mozilla/geckodriver/releases
+ARG GECKODRIVER_VERSION
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG FIREFOX_VERSION
-ARG GECKODRIVER_VERSION
 ARG CHROME_VERSION
 
 ENV SELENIUM_MAJOR_VERSION=3 \
@@ -20,7 +22,7 @@ ENV SELENIUM_MAJOR_VERSION=3 \
     SELENIUM_PATCH_VERSION=59 \
     SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
-    FIREFOX_VERSION=${FIREFOX_VERSION:-"78.11.0esr"} \
+    FIREFOX_VERSION=${FIREFOX_VERSION:-"91.0.1esr"} \
     CHROME_VERSION=${CHROME_VERSION:-"91.0.4472.114"} \
     GECKODRIVER_VERSION=${GECKODRIVER_VERSION:-"v0.29.1"} \
     DISPLAY=:99 \
@@ -33,10 +35,13 @@ ENV SELENIUM_VERSION=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.${SELEN
     PATH=${SELENIUM_HOME}/firefox:/opt/google/chrome:${PATH}
 
 # selenium server port
-EXPOSE $SELENIUM_PORT
+EXPOSE ${SELENIUM_PORT}
 
 # vnc port
-EXPOSE $VNC_PORT
+EXPOSE ${VNC_PORT}
+
+RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ && \
+    touch .Xauthority .vnc/config
 
 # selenium server
 RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
@@ -46,7 +51,6 @@ RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
 # chrome
 RUN curl -L https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-${CHROME_VERSION}-1.x86_64.rpm \
          -o google-chrome-stable-x86_64.rpm && \
-    # curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
     rpm -i google-chrome-stable-x86_64.rpm && \
     rm -f google-chrome-stable-x86_64.rpm
 
@@ -76,4 +80,5 @@ RUN chmod +x /init && \
 
 USER 1001
 
+# we use a custom init to start and stop container processes in the specific order
 CMD ["/init"]

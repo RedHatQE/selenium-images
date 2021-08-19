@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:34
+FROM registry.fedoraproject.org/fedora-minimal:34
 LABEL maintainer="dmisharo@redhat.com"
 
 ENV SELENIUM_HOME=/home/selenium
@@ -17,6 +17,7 @@ RUN PACKAGES="\
         cups-libs-2.3.3op2-7.fc34.x86_64 \
         dbus-glib-0.110-11.fc34.x86_64 \
         dbus-libs-1.12.20-3.fc34.x86_64 \
+        expat-2.4.1-1.fc34.x86_64 \
         fluxbox-1.3.7-17.fc34.x86_64 \
         fontconfig-2.13.94-2.fc34.x86_64 \
         freetype-2.10.4-3.fc34.x86_64 \
@@ -79,6 +80,7 @@ RUN PACKAGES="\
         nss-util-3.69.0-1.fc34.x86_64 \
         pango-1.48.8-1.fc34.x86_64 \
         pixman-0.40.0-3.fc34.x86_64 \
+        tar-2:1.34-1.fc34.x86_64 \
         tigervnc-server-minimal-1.11.0-12.fc34.x86_64 \
         tzdata-java-2021a-1.fc34.noarch \
         unzip-6.0-50.fc34.x86_64 \
@@ -87,9 +89,7 @@ RUN PACKAGES="\
         xdg-utils-1.1.3-9.fc34.noarch \
         xkbcomp-1.4.4-2.fc34.x86_64 \
         xkeyboard-config-2.33-1.fc34.noarch" && \
-    dnf --downloadonly --downloaddir=/tmp/cache install -y --setopt=install_weak_deps=False --nodocs ${PACKAGES} && \
-    for PACKAGE in ${PACKAGES}; do rpm -Uvh --nodeps /tmp/cache/${PACKAGE}.rpm; done && \
-    rm -rf /tmp/cache && \
-    dnf clean all && \
-    mkdir -p .cache/dconf .mozilla/plugins .vnc/ && \
-    touch .Xauthority .vnc/config
+    microdnf download -y ${PACKAGES} && \
+    rpm -Uvh --nodeps *.rpm && \
+    rm -f *.rpm && \
+    microdnf clean all
