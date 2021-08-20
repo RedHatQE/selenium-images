@@ -21,6 +21,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
+      - name: Build base image
+        uses: redhat-actions/buildah-build@v2.5
+        with:
+          image: quay.io/redhatqe/base
+          tags: latest
+          dockerfiles: base/Dockerfile
+          context: base
+          oci: true
       - name: Build standalone image
         uses: redhat-actions/buildah-build@v2.5
         with:
@@ -35,7 +43,7 @@ jobs:
             GECKODRIVER_VERSION=${{ matrix.gecko_version }}
       - name: Tag latest
         # job-index start from 0 an we want to tag image by "latest" only in last job
-        if: strategy.job-index == 5
+        if: strategy.job-index == 1
         run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
       - name: Push standalone image
         uses: redhat-actions/push-to-registry@v2.2
@@ -46,7 +54,7 @@ jobs:
           username: ${{ secrets.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_TOKEN }}
       - name: Push "latest" standalone image
-        if: strategy.job-index == 5
+        if: strategy.job-index == 1
         uses: redhat-actions/push-to-registry@v2.2
         with:
           image: selenium-standalone
