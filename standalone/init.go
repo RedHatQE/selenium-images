@@ -38,16 +38,16 @@ func startXvnc() *exec.Cmd {
 }
 
 func waitForPort() {
-	timeout := 5 * time.Second
 	n := 1
-	for n < 5 {
-		conn, _ := net.DialTimeout("tcp", net.JoinHostPort("localhost", os.Getenv("VNC_PORT")), timeout)
+	address := net.JoinHostPort("localhost", os.Getenv("VNC_PORT"))
+	for n < 50 {
+		conn, _ := net.Dial("tcp", address)
 		if conn != nil {
 			conn.Close()
 			break
 		}
 		n++
-		time.Sleep(time.Second)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
