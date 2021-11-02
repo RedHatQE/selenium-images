@@ -9,19 +9,19 @@ LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.1.0esr"
+ARG FIREFOX_VERSION="91.2.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.30.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="94.0.4606.54"
+ARG CHROME_VERSION="95.0.4638.54"
 
-ARG SELENIUM_MAJOR_VERSION=3
+ARG SELENIUM_MAJOR_VERSION=4
 
-ARG SELENIUM_MINOR_VERSION=141
+ARG SELENIUM_MINOR_VERSION=0
 
-ARG SELENIUM_PATCH_VERSION=59
+ARG SELENIUM_PATCH_VERSION=0
 
 ENV SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
@@ -42,7 +42,7 @@ RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ .fluxbox/ && \
     touch .Xauthority .vnc/config
 
 RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
-    curl -L http://selenium-release.storage.googleapis.com/${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}/selenium-server-standalone-${SELENIUM_VERSION}.jar \
+    curl -L https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_VERSION}/selenium-server-${SELENIUM_VERSION}.jar \
          -o ${SELENIUM_PATH}
 
 RUN curl -L https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-${CHROME_VERSION}-1.x86_64.rpm \
