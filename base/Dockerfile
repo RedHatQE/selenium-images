@@ -1,95 +1,28 @@
-FROM registry.fedoraproject.org/fedora-minimal:34
+FROM registry.fedoraproject.org/fedora-minimal:35
 LABEL maintainer="dmisharo@redhat.com"
 
-ENV SELENIUM_HOME=/home/selenium
+ARG SELENIUM_MAJOR_VERSION=4
 
-WORKDIR ${SELENIUM_HOME}
+ARG SELENIUM_MINOR_VERSION=0
+
+ARG SELENIUM_PATCH_VERSION=0
+
+ENV SELENIUM_PATH=/opt/selenium/selenium-server.jar
 
 RUN PACKAGES="\
-        alsa-lib \
-        at-spi2-atk \
-        at-spi2-core \
-        atk \
-        avahi-libs \
-        bzip2 \
-        cairo \
-        cairo-gobject \
-        cups-libs \
-        dbus-glib \
-        dbus-libs \
-        expat \
-        fluxbox \
-        fontconfig \
-        freetype \
-        fribidi \
-        gdk-pixbuf2 \
-        graphite2 \
-        gtk3 \
-        harfbuzz \
-        imlib2 \
-        java-1.8.0-openjdk-headless \
-        libcloudproviders \
-        libdatrie \
-        libdrm \
-        libepoxy \
-        liberation-fonts \
-        liberation-fonts-common \
-        liberation-mono-fonts \
-        liberation-sans-fonts \
-        liberation-serif-fonts \
-        libfontenc \
-        libglvnd \
-        libglvnd-glx \
-        libICE \
-        libjpeg-turbo \
-        libpng \
-        libSM \
-        libthai \
-        libwayland-client \
-        libwayland-cursor \
-        libwayland-egl \
-        libwayland-server \
-        libwebp \
-        libX11 \
-        libX11-common \
-        libX11-xcb \
-        libXau \
-        libxcb \
-        libXcomposite \
-        libXcursor \
-        libXdamage \
-        libXdmcp \
-        libXext \
-        libXfixes \
-        libXfont2 \
-        libXft \
-        libXi \
-        libXinerama \
-        libxkbcommon \
-        libxkbfile \
-        libXpm \
-        libXrandr \
-        libXrender \
-        libxshmfence \
-        libXt \
-        mesa-libgbm \
         nspr \
         nss \
         nss-softokn \
         nss-softokn-freebl \
         nss-util \
-        pango \
-        pixman \
-        tar \
-        tigervnc-server-minimal \
-        tzdata-java \
-        unzip \
-        vulkan-loader \
-        wget \
-        xdg-utils \
-        xkbcomp \
-        xkeyboard-config" && \
+        java-1.8.0-openjdk-headless \
+        tzdata-java" && \
     microdnf download -y --archlist=x86_64,noarch ${PACKAGES} && \
     rpm -Uvh --nodeps *.rpm && \
     rm -f *.rpm && \
     microdnf clean all
+
+RUN mkdir -p /opt/selenium/ && \
+    SELENIUM_VERSION=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.${SELENIUM_PATCH_VERSION} && \
+    curl -L https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_VERSION}/selenium-server-${SELENIUM_VERSION}.jar \
+         -o ${SELENIUM_PATH}
