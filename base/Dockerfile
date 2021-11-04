@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora-minimal:35
+FROM registry.fedoraproject.org/fedora-minimal:34
 LABEL maintainer="dmisharo@redhat.com"
 
 ARG SELENIUM_MAJOR_VERSION=4
