@@ -67,39 +67,20 @@ func printSeleniumCombinedOutput(seleniumStdout io.ReadCloser) {
 	}
 }
 
-func seleniumStandalone() *exec.Cmd {
-	return exec.Command(
-		"java",
-		"-jar",
-		os.Getenv("SELENIUM_PATH"),
-		"standalone",
-		"--host",
-		"0.0.0.0",
-		"--port",
-		os.Getenv("SELENIUM_PORT"),
-	)
-}
-
-func seleniumNode() *exec.Cmd {
-	return exec.Command(
+func startSelenium() *exec.Cmd {
+	fmt.Printf("Starting selenium %s\n", os.Getenv("SELENIUM_MODE"))
+	selenium := exec.Command(
 		"java",
 		"-jar",
 		os.Getenv("SELENIUM_PATH"),
 		"node",
+		"--max-sessions",
+		"1",
 		"--publish-events",
 		fmt.Sprintf("tcp://%s:%s", os.Getenv("SE_EVENT_BUS_HOST"), os.Getenv("SE_EVENT_BUS_PUBLISH_PORT")),
 		"--subscribe-events",
 		fmt.Sprintf("tcp://%s:%s", os.Getenv("SE_EVENT_BUS_HOST"), os.Getenv("SE_EVENT_BUS_SUBSCRIBE_PORT")),
 	)
-}
-
-func startSelenium() *exec.Cmd {
-	fmt.Printf("Starting selenium %s\n", os.Getenv("SELENIUM_MODE"))
-	var funcMap = map[string]func() *exec.Cmd{
-		"standalone": seleniumStandalone,
-		"node":       seleniumNode,
-	}
-	selenium := funcMap[os.Getenv("SELENIUM_MODE")]()
 	seleniumStdout, _ := selenium.StdoutPipe()
 	selenium.Stderr = selenium.Stdout
 	go printSeleniumCombinedOutput(seleniumStdout)
@@ -134,20 +115,12 @@ func stopProcesses(xvnc *exec.Cmd, fluxbox *exec.Cmd, selenium *exec.Cmd) {
 }
 
 func checkVars() {
-	if os.Getenv("SELENIUM_MODE") == "node" {
-		_, seEventBusHostPresent := os.LookupEnv("SE_EVENT_BUS_HOST")
-		if !seEventBusHostPresent {
-			fmt.Println("SE_EVENT_BUS_HOST not set, exiting!")
-			os.Exit(1)
-		}
-		_, seEventBusPublishPort := os.LookupEnv("SE_EVENT_BUS_PUBLISH_PORT")
-		if !seEventBusPublishPort {
-			fmt.Println("SE_EVENT_BUS_PUBLISH_PORT not set, exiting!")
-			os.Exit(1)
-		}
-		_, seEventBusSubscribePort := os.LookupEnv("SE_EVENT_BUS_SUBSCRIBE_PORT")
-		if !seEventBusSubscribePort {
-			fmt.Println("SE_EVENT_BUS_SUBSCRIBE_PORT not set, exiting!")
+	envVars := []string{"SE_EVENT_BUS_HOST", "SE_EVENT_BUS_PUBLISH_PORT", "SE_EVENT_BUS_SUBSCRIBE_PORT"}
+	for _, envVar := range envVars {
+		_, isVarPresented := os.LookupEnv(envVar)
+		if !isVarPresented {
+			line := fmt.Sprintf("%s not set, exiting!", envVar)
+			fmt.Println(line)
 			os.Exit(1)
 		}
 	}

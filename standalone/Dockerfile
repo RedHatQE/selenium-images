@@ -4,32 +4,42 @@ COPY init.go .
 
 RUN go build init.go
 
-FROM quay.io/redhatqe/selenium-base:4.0.0
+FROM registry.fedoraproject.org/fedora-minimal:34
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.2.0esr"
+ARG FIREFOX_VERSION="91.3.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.30.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="95.0.4638.54"
+ARG CHROME_VERSION="95.0.4638.69"
+
+ARG SELENIUM_MAJOR_VERSION=3
+
+ARG SELENIUM_MINOR_VERSION=141
+
+ARG SELENIUM_PATCH_VERSION=59
+
+ENV SELENIUM_HOME=/home/selenium
 
 ENV SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
-    HOME=/home/selenium \
+    HOME=${SELENIUM_HOME} \
     VNC_GEOMETRY=${VNC_GEOMETRY:-"1600x900"} \
-    PATH=/opt/firefox/:/opt/google/chrome/:${PATH}
+    SELENIUM_VERSION=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.${SELENIUM_PATCH_VERSION} \
+    SELENIUM_PATH=${SELENIUM_HOME}/selenium-server/selenium-server-standalone.jar \
+    PATH=${SELENIUM_HOME}/firefox:/opt/google/chrome:${PATH}
 
 EXPOSE ${SELENIUM_PORT}
 
 EXPOSE ${VNC_PORT}
 
-WORKDIR ${HOME}
+WORKDIR ${SELENIUM_HOME}
 
 RUN PACKAGES="\
         alsa-lib \
@@ -51,9 +61,9 @@ RUN PACKAGES="\
         gdk-pixbuf2 \
         graphite2 \
         gtk3 \
-        gzip \
         harfbuzz \
         imlib2 \
+        java-1.8.0-openjdk-headless \
         libcloudproviders \
         libdatrie \
         libdrm \
@@ -99,10 +109,16 @@ RUN PACKAGES="\
         libxshmfence \
         libXt \
         mesa-libgbm \
+        nspr \
+        nss \
+        nss-softokn \
+        nss-softokn-freebl \
+        nss-util \
         pango \
         pixman \
         tar \
         tigervnc-server-minimal \
+        tzdata-java \
         unzip \
         vulkan-loader \
         wget \
@@ -118,6 +134,10 @@ RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ .fluxbox/ && \
     echo "session.screen0.toolbar.visible: false" > .fluxbox/init && \
     touch .Xauthority .vnc/config
 
+RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
+    curl -L http://selenium-release.storage.googleapis.com/${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}/selenium-server-standalone-${SELENIUM_VERSION}.jar \
+         -o ${SELENIUM_PATH}
+
 RUN curl -L https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-${CHROME_VERSION}-1.x86_64.rpm \
          -o google-chrome-stable-x86_64.rpm && \
     rpm -i google-chrome-stable-x86_64.rpm && \
@@ -132,7 +152,7 @@ RUN CHROME_VERSION=$(rpm -q --qf "%{VERSION}\n" google-chrome-stable | sed -Ee '
     rm -f chromedriver_linux64.zip
 
 RUN curl -LO https://download-installer.cdn.mozilla.net/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2 && \
-    tar -C /opt/ -xjvf firefox-${FIREFOX_VERSION}.tar.bz2 && \
+    tar -C . -xjvf firefox-${FIREFOX_VERSION}.tar.bz2 && \
     rm -f firefox-${FIREFOX_VERSION}.tar.bz2
 
 RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz && \
@@ -142,8 +162,8 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
 COPY --from=builder /go/init /usr/bin/
 
 RUN chmod +x /usr/bin/init && \
-    chgrp -R 0 ${HOME} && \
-    chmod -R g=u ${HOME}
+    chgrp -R 0 ${SELENIUM_HOME} && \
+    chmod -R g=u ${SELENIUM_HOME}
 
 USER 1001
 
