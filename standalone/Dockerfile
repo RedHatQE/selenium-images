@@ -4,24 +4,26 @@ COPY init.go .
 
 RUN go build init.go
 
-FROM quay.io/redhatqe/selenium-base:latest
+FROM registry.fedoraproject.org/fedora-minimal:34
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.1.0esr"
+ARG FIREFOX_VERSION="91.3.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.30.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="94.0.4606.54"
+ARG CHROME_VERSION="95.0.4638.69"
 
 ARG SELENIUM_MAJOR_VERSION=3
 
 ARG SELENIUM_MINOR_VERSION=141
 
 ARG SELENIUM_PATCH_VERSION=59
+
+ENV SELENIUM_HOME=/home/selenium
 
 ENV SELENIUM_PORT=4444 \
     VNC_PORT=5999 \
@@ -36,6 +38,97 @@ ENV SELENIUM_PORT=4444 \
 EXPOSE ${SELENIUM_PORT}
 
 EXPOSE ${VNC_PORT}
+
+WORKDIR ${SELENIUM_HOME}
+
+RUN PACKAGES="\
+        alsa-lib \
+        at-spi2-atk \
+        at-spi2-core \
+        atk \
+        avahi-libs \
+        bzip2 \
+        cairo \
+        cairo-gobject \
+        cups-libs \
+        dbus-glib \
+        dbus-libs \
+        expat \
+        fluxbox \
+        fontconfig \
+        freetype \
+        fribidi \
+        gdk-pixbuf2 \
+        graphite2 \
+        gtk3 \
+        harfbuzz \
+        imlib2 \
+        java-1.8.0-openjdk-headless \
+        libcloudproviders \
+        libdatrie \
+        libdrm \
+        libepoxy \
+        liberation-fonts \
+        liberation-fonts-common \
+        liberation-mono-fonts \
+        liberation-sans-fonts \
+        liberation-serif-fonts \
+        libfontenc \
+        libglvnd \
+        libglvnd-glx \
+        libICE \
+        libjpeg-turbo \
+        libpng \
+        libSM \
+        libthai \
+        libwayland-client \
+        libwayland-cursor \
+        libwayland-egl \
+        libwayland-server \
+        libwebp \
+        libX11 \
+        libX11-common \
+        libX11-xcb \
+        libXau \
+        libxcb \
+        libXcomposite \
+        libXcursor \
+        libXdamage \
+        libXdmcp \
+        libXext \
+        libXfixes \
+        libXfont2 \
+        libXft \
+        libXi \
+        libXinerama \
+        libxkbcommon \
+        libxkbfile \
+        libXpm \
+        libXrandr \
+        libXrender \
+        libxshmfence \
+        libXt \
+        mesa-libgbm \
+        nspr \
+        nss \
+        nss-softokn \
+        nss-softokn-freebl \
+        nss-util \
+        pango \
+        pixman \
+        tar \
+        tigervnc-server-minimal \
+        tzdata-java \
+        unzip \
+        vulkan-loader \
+        wget \
+        xdg-utils \
+        xkbcomp \
+        xkeyboard-config" && \
+    microdnf download -y --archlist=x86_64,noarch ${PACKAGES} && \
+    rpm -Uvh --nodeps *.rpm && \
+    rm -f *.rpm && \
+    microdnf clean all
 
 RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ .fluxbox/ && \
     echo "session.screen0.toolbar.visible: false" > .fluxbox/init && \
@@ -68,11 +161,11 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
 
 COPY --from=builder /go/init /usr/bin/
 
-RUN chmod +x /usr/bin/init && \
-    chgrp -R 0 ${SELENIUM_HOME} && \
-    chmod -R g=u ${SELENIUM_HOME}
-
 USER 1001
+
+RUN chmod +x /usr/bin/init && \
+    chgrp -R 1001:0 ${SELENIUM_HOME} && \
+    chmod -R g=u ${SELENIUM_HOME}
 
 # we use a custom init to start and stop container processes in the specific order
 CMD ["init"]
