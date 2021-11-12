@@ -161,11 +161,11 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
 
 COPY --from=builder /go/init /usr/bin/
 
-RUN chmod +x /usr/bin/init && \
-    chgrp -R 0 ${SELENIUM_HOME} && \
-    chmod -R g=u ${SELENIUM_HOME}
-
 USER 1001
+
+RUN chmod +x /usr/bin/init && \
+    chgrp -R 1001:0 ${SELENIUM_HOME} && \
+    chmod -R g=u ${SELENIUM_HOME}
 
 # we use a custom init to start and stop container processes in the specific order
 CMD ["init"]

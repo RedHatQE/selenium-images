@@ -1,24 +1,51 @@
-![Building and pushing to quay.io](https://github.com/RedHatQE/selenium-images/workflows/Building%20Red%20Hat%20QE%20selenium%20images/badge.svg)
+# Red Hat QE Selenium Images
 
-Red Hat QE Selenium Images
-==========================
+Fedora based container images for running UI tests. Images can be used locally and in OpenShift.
 
-Container images for running UI tests. Images can be used locally and in OpenShift.
+## Selenium Grid
 
-Deployment
-==========
+Images in the `grid` directory are supposed to be use in the Selenium Grid. Please refer to the
+[Selenium documentation](https://www.selenium.dev/documentation/grid/) for the details.
 
-Images are built using [Github Actions](https://github.com/RedHatQE/selenium-images/actions) and pushed to quay.io registry: https://quay.io/repository/redhatqe/selenium-standalone
+## Selenium Standalone
 
-Usage
-=====
+Standalone version includes Google Chrome and Mozilla Firefox browsers. A container is supposed to
+be runnning either locally or within a Kubernetes pod.
 
-In order to start a container use the following command:
+In order to start a container locally use the following command:
 
 `podman run -it --shm-size=2g -p 4444:4444 -p 5999:5999 quay.io/redhatqe/selenium-standalone`
 
-Exposed ports
-=============
-
 * `4444`: standard selenium standalone server port
 * `5999`: VNC port
+
+To run a container within a pod use this manifest as an example:
+
+```yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: some-name
+spec:
+  containers:
+    - resources:
+        limits:
+          cpu: '1'
+          memory: 3Gi
+        requests:
+          cpu: '1'
+          memory: 3Gi
+      terminationMessagePath: /dev/termination-log
+      name: selenium
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
+      terminationMessagePolicy: File
+      image: 'quay.io/redhatqe/selenium-standalone:latest'
+  volumes:
+    - name: shm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 2Gi
+```
