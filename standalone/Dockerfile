@@ -2,20 +2,20 @@ FROM docker.io/library/golang:1.17 AS builder
 
 COPY init.go .
 
-RUN go build init.go
+RUN go build init.go && chmod +x /go/init
 
 FROM registry.fedoraproject.org/fedora-minimal:34
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.3.0esr"
+ARG FIREFOX_VERSION="91.5.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.30.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="95.0.4638.69"
+ARG CHROME_VERSION="98.0.4758.80"
 
 ARG SELENIUM_MAJOR_VERSION=3
 
@@ -159,13 +159,11 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
     tar -C /usr/bin/ -xvf geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz && \
     rm -f geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz
 
-COPY --from=builder /go/init /usr/bin/
+COPY --from=builder /go/init /init
 
-USER 1001
-
-RUN chmod +x /usr/bin/init && \
-    chgrp -R 1001:0 ${SELENIUM_HOME} && \
+RUN chown -R 1001:0 ${SELENIUM_HOME} && \
     chmod -R g=u ${SELENIUM_HOME}
 
+USER 1001
 # we use a custom init to start and stop container processes in the specific order
-CMD ["init"]
+CMD ["/init"]
