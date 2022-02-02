@@ -23,6 +23,7 @@ RUN PACKAGES="\
     microdnf clean all
 
 RUN mkdir -p /opt/selenium/ && \
+    SELENIUM_VERSION_DIRECTORY=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.0 && \
     SELENIUM_VERSION=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.${SELENIUM_PATCH_VERSION} && \
-    curl -L https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_VERSION}/selenium-server-${SELENIUM_VERSION}.jar \
+    curl -L https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_VERSION_DIRECTORY}/selenium-server-${SELENIUM_VERSION}.jar \
          -o ${SELENIUM_PATH}
