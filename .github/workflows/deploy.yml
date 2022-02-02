@@ -21,22 +21,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Build base image
-        uses: redhat-actions/buildah-build@v2.5
-        with:
-          image: quay.io/redhatqe/selenium-base
-          tags: latest
-          dockerfiles: base/Dockerfile
-          context: base
-          oci: true
-      - name: Push base image
-        uses: redhat-actions/push-to-registry@v2.2
-        with:
-          image: selenium-base
-          tags: latest
-          registry: quay.io/redhatqe
-          username: ${{ secrets.QUAY_IO_USERNAME }}
-          password: ${{ secrets.QUAY_IO_TOKEN }}
       - name: Build standalone image
         uses: redhat-actions/buildah-build@v2.5
         with:
