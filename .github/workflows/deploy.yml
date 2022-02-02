@@ -14,8 +14,8 @@ jobs:
         # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
         # Chrome versions
         # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-        firefox_version: ["78.14.0esr", "91.1.0esr"]
-        chrome_version: ["94.0.4606.54"]
+        firefox_version: ["78.9.0esr", "91.5.1esr"]
+        chrome_version: ["98.0.4758.80"]
         gecko_version: ["v0.30.0"]
     steps:
       - uses: actions/checkout@v2
