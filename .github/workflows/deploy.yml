@@ -14,40 +14,35 @@ jobs:
         # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
         # Chrome versions
         # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-        firefox_version: ["78.9.0esr", "91.5.1esr"]
-        chrome_version: ["98.0.4758.80"]
-        gecko_version: ["v0.30.0"]
+        firefox_version: ["91.8.0esr"]
+        chrome_version: ["101.0.4951.41"]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Build standalone image
-        uses: redhat-actions/buildah-build@v2.5
+        uses: redhat-actions/buildah-build@v2
         with:
           image: quay.io/redhatqe/selenium-standalone
-          tags: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          tags: ff_${{ matrix.firefox_version }}_chrome_${{ matrix.chrome_version }}
           dockerfiles: standalone/Dockerfile
           context: standalone
           oci: true
           build-args: |
             CHROME_VERSION=${{ matrix.chrome_version }}
             FIREFOX_VERSION=${{ matrix.firefox_version }}
-            GECKODRIVER_VERSION=${{ matrix.gecko_version }}
       - name: Tag latest
-        # job-index start from 0 an we want to tag image by "latest" only in last job
-        if: strategy.job-index == 1
-        run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
+        run: buildah tag quay.io/redhatqe/selenium-standalone:ff_${{ matrix.firefox_version }}_chrome_${{ matrix.chrome_version }} quay.io/redhatqe/selenium-standalone:latest
       - name: Push standalone image
-        uses: redhat-actions/push-to-registry@v2.2
+        uses: redhat-actions/push-to-registry@v2
         with:
           image: selenium-standalone
-          tags: ff_${{ matrix.firefox_version }}_gecko_${{ matrix.gecko_version }}_chrome_${{ matrix.chrome_version }}
+          tags: ff_${{ matrix.firefox_version }}_chrome_${{ matrix.chrome_version }}
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_TOKEN }}
       - name: Push "latest" standalone image
-        if: strategy.job-index == 1
-        uses: redhat-actions/push-to-registry@v2.2
+        uses: redhat-actions/push-to-registry@v2
         with:
           image: selenium-standalone
           tags: latest
