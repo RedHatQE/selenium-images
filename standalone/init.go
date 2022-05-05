@@ -74,7 +74,7 @@ func startSelenium() *exec.Cmd {
 		"--port",
 		os.Getenv("SELENIUM_PORT"),
 		"--session-timeout",
-		os.Getenv("SELENIUM_SESSION_TIMEOUT")
+		os.Getenv("SELENIUM_SESSION_TIMEOUT"),
 	)
 	seleniumStdout, _ := selenium.StdoutPipe()
 	selenium.Stderr = selenium.Stdout
