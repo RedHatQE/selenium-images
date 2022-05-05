@@ -66,7 +66,16 @@ func printSeleniumCombinedOutput(seleniumStdout io.ReadCloser) {
 
 func startSelenium() *exec.Cmd {
 	fmt.Println("Starting selenium standalone")
-	selenium := exec.Command("java", "-jar", os.Getenv("SELENIUM_PATH"), "standalone", "--port", os.Getenv("SELENIUM_PORT"))
+	selenium := exec.Command(
+		"java",
+		"-jar",
+		os.Getenv("SELENIUM_PATH"),
+		"standalone",
+		"--port",
+		os.Getenv("SELENIUM_PORT"),
+		"--session-timeout",
+		os.Getenv("SELENIUM_SESSION_TIMEOUT"),
+	)
 	seleniumStdout, _ := selenium.StdoutPipe()
 	selenium.Stderr = selenium.Stdout
 	go printSeleniumCombinedOutput(seleniumStdout)

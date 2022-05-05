@@ -9,13 +9,13 @@ LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.8.0esr"
+ARG FIREFOX_VERSION="91.9.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.31.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="101.0.4951.41"
+ARG CHROME_VERSION="101.0.4951.54"
 
 ARG SELENIUM_MAJOR_VERSION=4
 
@@ -26,6 +26,7 @@ ARG SELENIUM_PATCH_VERSION=4
 ENV SELENIUM_HOME=/home/selenium
 
 ENV SELENIUM_PORT=4444 \
+    SELENIUM_SESSION_TIMEOUT=1800 \
     VNC_PORT=5999 \
     DISPLAY=:99 \
     DBUS_SESSION_BUS_ADDRESS=/dev/null \
