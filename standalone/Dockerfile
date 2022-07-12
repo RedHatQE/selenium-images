@@ -9,19 +9,19 @@ LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.9.0esr"
+ARG FIREFOX_VERSION="91.9.1esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
 ARG GECKODRIVER_VERSION="v0.31.0"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="101.0.4951.54"
+ARG CHROME_VERSION="103.0.5060.114"
 
 ARG SELENIUM_MAJOR_VERSION=4
 
-ARG SELENIUM_MINOR_VERSION=1
+ARG SELENIUM_MINOR_VERSION=3
 
-ARG SELENIUM_PATCH_VERSION=4
+ARG SELENIUM_PATCH_VERSION=0
 
 ENV SELENIUM_HOME=/home/selenium
 
@@ -132,7 +132,7 @@ RUN PACKAGES="\
     microdnf clean all
 
 RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ .fluxbox/ && \
-    echo "session.screen0.toolbar.visible: false" > .fluxbox/init && \
+    echo "session.screen0.toolbar.autoHide: true" > .fluxbox/init && \
     touch .Xauthority .vnc/config
 
 RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
