@@ -4,22 +4,22 @@ COPY init.go .
 
 RUN go build init.go && chmod +x /go/init
 
-FROM registry.fedoraproject.org/fedora-minimal:34
+FROM registry.fedoraproject.org/fedora-minimal:37
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
-ARG FIREFOX_VERSION="91.9.1esr"
+ARG FIREFOX_VERSION="102.8.0esr"
 # Gecko driver releases
 # https://github.com/mozilla/geckodriver/releases
-ARG GECKODRIVER_VERSION="v0.31.0"
+ARG GECKODRIVER_VERSION="v0.32.2"
 # Chrome versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
-ARG CHROME_VERSION="103.0.5060.114"
+ARG CHROME_VERSION="110.0.5481.177"
 
 ARG SELENIUM_MAJOR_VERSION=4
 
-ARG SELENIUM_MINOR_VERSION=3
+ARG SELENIUM_MINOR_VERSION=6
 
 ARG SELENIUM_PATCH_VERSION=0
 
