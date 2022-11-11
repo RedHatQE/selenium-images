@@ -49,3 +49,6 @@ spec:
         medium: Memory
         sizeLimit: 2Gi
 ```
+
+The standalone container image also starts a small HTTP server to allow selenium to be shut down via an HTTP GET to '/shutdown' on port 8000. This is useful
+when running the selenium container as a sidecar in a kubernetes pod to have your testing container shut the selenium container down when tests are completed.
