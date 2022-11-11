@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -91,12 +93,6 @@ func startProcesses() (*exec.Cmd, *exec.Cmd, *exec.Cmd) {
 	return xvnc, fluxbox, selenium
 }
 
-func waitForSignals() {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	<-sigs
-}
-
 func stopProcesses(xvnc *exec.Cmd, fluxbox *exec.Cmd, selenium *exec.Cmd) {
 	fmt.Println("Stopping selenium")
 	selenium.Process.Kill()
@@ -110,8 +106,38 @@ func stopProcesses(xvnc *exec.Cmd, fluxbox *exec.Cmd, selenium *exec.Cmd) {
 }
 
 func main() {
+	// start procs, then allow graceful shutdown with HTTP API or signal handler
 	xvnc, fluxbox, selenium := startProcesses()
-	waitForSignals()
+
+	// shutdown handler based on:
+	// https://medium.com/@int128/shutdown-http-server-by-endpoint-in-go-2a0e2d7f9b8c
+	// using signal.NotifyContext instead of context.WithCancel
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	m := http.NewServeMux()
+	address := net.JoinHostPort("localhost", os.Getenv("API_PORT"))
+	s := http.Server{Addr: address, Handler: m}
+	m.HandleFunc("/shutdown", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Received shutdown request via HTTP")
+		w.Write([]byte("OK"))
+		stop()
+	})
+	go func() {
+		fmt.Printf("HTTP server listening on '%s'\n", address)
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		// Shutdown the HTTP server if context is cancelled
+		// Context can either be cancelled by '/shutdown' handler or by SIGINT/SIGTERM
+		s.Shutdown(ctx)
+	}
+
 	stopProcesses(xvnc, fluxbox, selenium)
 	fmt.Println("Bye bye")
 	os.Exit(0)
