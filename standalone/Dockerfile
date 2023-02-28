@@ -65,6 +65,7 @@ RUN PACKAGES="\
         gdk-pixbuf2 \
         graphite2 \
         gtk3 \
+        gzip \
         harfbuzz \
         imlib2 \
         java-1.8.0-openjdk-headless \
