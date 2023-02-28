@@ -4,7 +4,7 @@ COPY init.go .
 
 RUN go build init.go && chmod +x /go/init
 
-FROM registry.fedoraproject.org/fedora-minimal:34
+FROM registry.fedoraproject.org/fedora-minimal:35
 LABEL maintainer="dmisharo@redhat.com"
 
 # Firefox releases
