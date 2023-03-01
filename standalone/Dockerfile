@@ -118,8 +118,6 @@ RUN PACKAGES="\
         nss-softokn \
         nss-softokn-freebl \
         nss-util \
-        nss-tools \
-        nss-sysinit \
         pango \
         pixman \
         tar \
@@ -169,9 +167,6 @@ COPY --from=builder /go/init /init
 
 RUN chown -R 1001:0 ${SELENIUM_HOME} && \
     chmod -R g=u ${SELENIUM_HOME}
-
-# enable FIPS support for NSS
-RUN modutil -fips true -dbdir /etc/pki/nssdb -force
 
 USER 1001
 # we use a custom init to start and stop container processes in the specific order
