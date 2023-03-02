@@ -3,8 +3,7 @@ FROM quay.io/redhatqe/selenium-standalone:latest
 USER 0
 
 RUN microdnf update -y && \
-    microdnf install -y crypto-policies-scripts nss-tools nss-sysinit && \
-    update-crypto-policies --set FIPS && \
+    microdnf install -y nss-tools nss-sysinit && \
     modutil -fips true -dbdir /etc/pki/nssdb -force && \
     chown -R 0:0 /etc/pki/nssdb && \
     chmod 644 /etc/pki/nssdb/* && \
