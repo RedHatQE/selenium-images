@@ -24,11 +24,10 @@ jobs:
         id: step_one
         run: |
           echo "short_sha=$(git rev-parse --short=7 $GITHUB_SHA)" >> $GITHUB_ENV
-          echo "image=quay.io/redhatqe/selenium-standalone" >> $GITHUB_ENV
       - name: Build standalone image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ env.image }}
+          image: quay.io/redhatqe/selenium-standalone
           tags: latest ${{ env.short_sha }} ff_${{ matrix.firefox_version }}_chrome_${{ matrix.chrome_version }}
           dockerfiles: standalone/Dockerfile
           context: standalone
@@ -39,7 +38,7 @@ jobs:
       - name: Push
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ env.image }}
+          image: selenium-standalone
           tags: latest ${{ env.short_sha }} ff_${{ matrix.firefox_version }}_chrome_${{ matrix.chrome_version }}
           registry: quay.io/redhatqe
           username: ${{ secrets.QUAY_IO_USERNAME }}
