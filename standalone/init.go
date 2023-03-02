@@ -70,6 +70,8 @@ func startSelenium() *exec.Cmd {
 	fmt.Println("Starting selenium standalone")
 	selenium := exec.Command(
 		"java",
+                "-Dcom.redhat.fips=false",
+                "-Djava.security.disableSystemPropertiesFile=true",
 		"-jar",
 		os.Getenv("SELENIUM_PATH"),
 		"standalone",
