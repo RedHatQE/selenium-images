@@ -170,9 +170,15 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
 
 COPY --from=builder /go/init /init
 
+# enable FIPS mode for NSS
+RUN modutil -fips true -dbdir /etc/pki/nssdb -force && \
+    chown -R 0:0 /etc/pki/nssdb && \
+    chmod 644 /etc/pki/nssdb/* && \
+
 RUN chown -R 1001:0 ${SELENIUM_HOME} && \
     chmod -R g=u ${SELENIUM_HOME}
 
 USER 1001
+
 # we use a custom init to start and stop container processes in the specific order
 CMD ["/init"]
