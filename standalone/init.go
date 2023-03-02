@@ -70,8 +70,11 @@ func startSelenium() *exec.Cmd {
 	fmt.Println("Starting selenium standalone")
 	selenium := exec.Command(
 		"java",
+	        "-Dwebdriver.http.factory=jdk-http-client",
 		"-jar",
 		os.Getenv("SELENIUM_PATH"),
+		"--ext",
+		os.Getenv("SELENIUM_HTTP_JDK_CLIENT_PATH"),
 		"standalone",
 		"--port",
 		os.Getenv("SELENIUM_PORT"),
