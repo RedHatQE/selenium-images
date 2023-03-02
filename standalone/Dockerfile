@@ -5,7 +5,7 @@ COPY init.go .
 RUN go build init.go && chmod +x /go/init
 
 FROM registry.fedoraproject.org/fedora-minimal:34
-LABEL maintainer="dmisharo@redhat.com"
+LABEL maintainer="bsquizza@redhat.com"
 
 # Firefox releases
 # https://download-installer.cdn.mozilla.net/pub/firefox/releases/
@@ -19,9 +19,9 @@ ARG CHROME_VERSION="103.0.5060.114"
 
 ARG SELENIUM_MAJOR_VERSION=4
 
-ARG SELENIUM_MINOR_VERSION=3
+ARG SELENIUM_MINOR_VERSION=8
 
-ARG SELENIUM_PATCH_VERSION=0
+ARG SELENIUM_PATCH_VERSION=1
 
 ENV SELENIUM_HOME=/home/selenium
 
@@ -35,6 +35,7 @@ ENV SELENIUM_PORT=4444 \
     VNC_GEOMETRY=${VNC_GEOMETRY:-"1600x900"} \
     SELENIUM_VERSION=${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.${SELENIUM_PATCH_VERSION} \
     SELENIUM_PATH=${SELENIUM_HOME}/selenium-server/selenium-server-standalone.jar \
+    SELENIUM_HTTP_JDK_CLIENT_PATH=${SELENIUM_HOME}/selenium-server/selenium-http-jdk-client.jar \
     PATH=${SELENIUM_HOME}/firefox:/opt/google/chrome:${PATH}
 
 EXPOSE ${SELENIUM_PORT}
@@ -67,7 +68,7 @@ RUN PACKAGES="\
         gtk3 \
         harfbuzz \
         imlib2 \
-        java-1.8.0-openjdk-headless \
+        java-11-openjdk-headless \
         libcloudproviders \
         libdatrie \
         libdrm \
@@ -118,6 +119,8 @@ RUN PACKAGES="\
         nss-softokn \
         nss-softokn-freebl \
         nss-util \
+        nss-tools \
+        nss-sysinit \
         pango \
         pixman \
         tar \
@@ -140,10 +143,12 @@ RUN mkdir -p .cache/dconf .mozilla/plugins .vnc/ .fluxbox/ && \
 
 RUN mkdir -p ${SELENIUM_HOME}/selenium-server && \
     curl -L https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_MAJOR_VERSION}.${SELENIUM_MINOR_VERSION}.0/selenium-server-${SELENIUM_VERSION}.jar \
-         -o ${SELENIUM_PATH}
+        -o ${SELENIUM_PATH} && \
+    curl -L https://repo1.maven.org/maven2/org/seleniumhq/selenium/selenium-http-jdk-client/${SELENIUM_VERSION}/selenium-http-jdk-client-${SELENIUM_VERSION}.jar \
+        -o ${SELENIUM_HTTP_JDK_CLIENT_PATH}
 
 RUN curl -L https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-${CHROME_VERSION}-1.x86_64.rpm \
-         -o google-chrome-stable-x86_64.rpm && \
+        -o google-chrome-stable-x86_64.rpm && \
     rpm -i google-chrome-stable-x86_64.rpm && \
     rm -f google-chrome-stable-x86_64.rpm
 
@@ -165,9 +170,15 @@ RUN curl -LO https://github.com/mozilla/geckodriver/releases/download/${GECKODRI
 
 COPY --from=builder /go/init /init
 
+# enable FIPS mode for NSS
+RUN modutil -fips true -dbdir /etc/pki/nssdb -force && \
+    chown -R 0:0 /etc/pki/nssdb && \
+    chmod 644 /etc/pki/nssdb/*
+
 RUN chown -R 1001:0 ${SELENIUM_HOME} && \
     chmod -R g=u ${SELENIUM_HOME}
 
 USER 1001
+
 # we use a custom init to start and stop container processes in the specific order
 CMD ["/init"]

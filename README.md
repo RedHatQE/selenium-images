@@ -12,6 +12,8 @@ Images in the `grid` directory are supposed to be use in the Selenium Grid. Plea
 Standalone version includes Google Chrome and Mozilla Firefox browsers. A container is supposed to
 be runnning either locally or within a Kubernetes pod.
 
+This container image is capable of running on a host with FIPS crypto policies enabled.
+
 In order to start a container locally use the following command:
 
 `podman run -it --shm-size=2g -p 4444:4444 -p 5999:5999 quay.io/redhatqe/selenium-standalone`
