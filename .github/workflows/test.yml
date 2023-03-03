@@ -8,13 +8,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - name: Build standalone image
         uses: redhat-actions/buildah-build@v2.5
         with:
-          image: quay.io/redhatqe/selenium-standalone
+          image: quay.io/redhatqe/selenium-standalone:test
           dockerfiles: standalone/Dockerfile
           context: standalone
           oci: true
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Start container
+        run: |
+          podman --version
+          podman run --name selenium -it --rm -d -p 4444:4444 quay.io/redhatqe/selenium-standalone:test
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'g
+      - name: Run test
+        timeout-minutes: 1
+        run: |
+          python test/test_selenium.py
+      - name: Cleanup
+        if: always()
+        run: |
+          if podman inspect selenium; then podman stop selenium; fi
