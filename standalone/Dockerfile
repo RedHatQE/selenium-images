@@ -111,6 +111,7 @@ RUN PACKAGES="\
         libXpm \
         libXrandr \
         libXrender \
+        libXtst \
         libxshmfence \
         libXt \
         mesa-libgbm \

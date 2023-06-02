@@ -5,7 +5,7 @@ on:
     types: ["opened", "synchronize", "reopened"]
 
 jobs:
-  build:
+  test-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,3 +18,6 @@ jobs:
           dockerfiles: standalone/Dockerfile
           context: standalone
           oci: true
+      - name: Test if firefox runs without errors
+        run: |
+          podman run -it --rm selenium-standalone:latest firefox --version | grep 'Mozilla Firefox'
